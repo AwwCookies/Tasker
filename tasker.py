@@ -1,4 +1,10 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#   Author: Emma Jones (AwwCookies)                                           #
+#   Last Update: Apr 30 2015                                              # # #
+#   Version: 1.0                                                          # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 import sqlite3
 import sys
@@ -26,8 +32,7 @@ if len(sys.argv) > 1:
         cursor.execute("DELETE FROM tasker WHERE id LIKE %i" % int(sys.argv[2]))
         #TODO Find a better way of reindexing the table
         rows = []
-        for row in cursor.execute("SELECT * FROM tasker"):
-            id, name, desc = row
+        for id, name, desc in cursor.execute("SELECT * FROM tasker"):
             rows.append((id, name, desc))
         cursor.execute("DROP TABLE tasker")
         cursor.execute('CREATE TABLE  tasker (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT)')
@@ -40,7 +45,8 @@ if len(sys.argv) > 1:
         if str(raw_input("Are you sure you want to delete all your task?: ")) in ["y", "yes", "fuck yes"]:
             cursor.execute("DROP TABLE tasker")
             print("The evil has been purged.")
+    if sys.argv[1] in ["help", "wtf"]:
+        pass
 else:
-    for row in cursor.execute("SELECT * FROM tasker"):
-        id, name, description = row
+    for id, name, description in cursor.execute("SELECT * FROM tasker"):
         print("[%i] %s: %s" % (id, name, description))
