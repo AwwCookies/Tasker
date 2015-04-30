@@ -1,4 +1,4 @@
 # Tasker
 A simple term task manger
 
-[![asciicast](https://asciinema.org/a/19355.png)](https://asciinema.org/a/19355)
+<script type="text/javascript" src="https://asciinema.org/a/19355.js" id="asciicast-19355" async></script>
