@@ -13,8 +13,8 @@ cursor.execute("CREATE TABLE IF NOT EXISTS tasker (id INTEGER PRIMARY KEY AUTOIN
 connection.commit()
 if len(sys.argv) > 1:
     if sys.argv[1] in ["add", "a", "new", "create"]:
-        cursor.execute('INSERT INTO tasker (name, description) VALUES ("%s", "%s")' \
-            % (sys.argv[2], ' '.join(sys.argv[3:])))
+        cursor.execute('INSERT INTO tasker (name, description) VALUES ("%s", "%s")'
+                       % (sys.argv[2], ' '.join(sys.argv[3:])))
         print("Task: %s added!" % sys.argv[2])
         connection.commit()
     if sys.argv[1] in ["remove", "delete", "del", "rem"]:
