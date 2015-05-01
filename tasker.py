@@ -25,21 +25,21 @@ cursor.execute(
 connection.commit()
 
 
-def export_csv(cursor, path=DB_PATH + "tasker.csv"):
-    with open(path, 'w') as csv:
-        for ID, name, desc in cursor.execute("SELECT * FROM tasker"):
-            csv.write("%s, %s, %s\n" % (ID, name, desc))
+def export_csv(cursor):
+    for ID, name, desc in cursor.execute("SELECT * FROM tasker"):
+        print("%s, %s, %s" % (ID, name, desc))
 
 
-def export_json(cursor, path=DB_PATH + "tasker.csv"):
+def export_json(cursor, path="/dev/stdout"):
     db = dict()
     for ID, name, desc in cursor.execute("SELECT * FROM tasker"):
         db[ID] = {"ID": ID, "name": name, "desc": desc}
-    with open(path, 'w') as j:
-        j.write(json.dumps(db) + "\n")
+    print(json.dumps(db))
+
 
 def update():
-    ud = urllib.request.urlopen('https://raw.githubusercontent.com/AwwCookies/Tasker/master/tasker.py').read().decode('utf-8')
+    ud = urllib.request.urlopen(
+        'https://raw.githubusercontent.com/AwwCookies/Tasker/master/tasker.py').read().decode('utf-8')
     with open("/tmp/tasker.py", 'w') as updated_file:
         updated_file.write(str(ud))
     os.system("sudo mv /tmp/tasker.py /usr/bin/tasker")
@@ -78,15 +78,9 @@ if len(sys.argv) > 1:
         pass
     if sys.argv[1] == "export":
         if sys.argv[2] == "csv":
-            if len(sys.argv) > 3:
-                export_csv(cursor, sys.argv[3])
-            else:
-                export_csv(cursor)
+            export_csv(cursor)
         elif sys.argv[2] == "json":
-            if len(sys.argv) > 3:
-                export_json(cursor, sys.argv[3])
-            else:
-                export_json(cursor)
+            export_json(cursor)
     if sys.argv[1] == "update":
         update()
         print("Update complete")
