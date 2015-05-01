@@ -3,12 +3,14 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #   Author: Emma Jones (AwwCookies)                                           #
 #   Last Update: Apr 30 2015                                              # # #
-#   Version: 1.0                                                          # #
+#   Version: 1.3                                                          # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sqlite3
 import json
 import sys
+import urllib.request
+import os
 
 # Path to Tasker DB
 DB_PATH = "/home/aww/"
@@ -35,6 +37,13 @@ def export_json(cursor, path=DB_PATH + "tasker.csv"):
         db[ID] = {"ID": ID, "name": name, "desc": desc}
     with open(path, 'w') as j:
         j.write(json.dumps(db) + "\n")
+
+def update():
+    ud = urllib.request.urlopen('https://raw.githubusercontent.com/AwwCookies/Tasker/master/tasker.py').read().decode('utf-8')
+    with open("/tmp/tasker.py", 'w') as updated_file:
+        updated_file.write(str(ud))
+    os.system("sudo mv /tmp/tasker.py /usr/bin/tasker")
+    os.system("sudo chmod +777 /usr/bin/tasker")
 
 # $ tasker
 if len(sys.argv) > 1:
@@ -78,6 +87,9 @@ if len(sys.argv) > 1:
                 export_json(cursor, sys.argv[3])
             else:
                 export_json(cursor)
+    if sys.argv[1] == "update":
+        update()
+        print("Update complete")
 else:
     for ID, name, description in cursor.execute("SELECT * FROM tasker"):
         print("[%i] %s: %s" % (ID, name, description))
