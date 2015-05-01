@@ -3,7 +3,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #   Author: Emma Jones (AwwCookies)                                           #
 #   Last Update: Apr 30 2015                                              # # #
-#   Version: 1.3                                                          # #
+#   Version: 1.4                                                          # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sqlite3
@@ -30,7 +30,7 @@ def export_csv(cursor):
         print("%s, %s, %s" % (ID, name, desc))
 
 
-def export_json(cursor, path="/dev/stdout"):
+def export_json(cursor):
     db = dict()
     for ID, name, desc in cursor.execute("SELECT * FROM tasker"):
         db[ID] = {"ID": ID, "name": name, "desc": desc}
