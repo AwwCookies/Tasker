@@ -4,7 +4,7 @@
 #   Author: Emma Jones (AwwCookies)                                           #
 #   Last Update: Apr 30 2015                                              # # #
 #   Version: 1.0                                                          # #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sqlite3
 import json
@@ -17,29 +17,24 @@ connection = sqlite3.connect(DB_PATH + "tasker.db")
 cursor = connection.cursor()
 
 # Create a new table in the database if one does not exists with three cols
-cursor.execute("CREATE TABLE IF NOT EXISTS tasker (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT)")
+cursor.execute(
+    "CREATE TABLE IF NOT EXISTS tasker (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT)")
 # This saves the changes to the database
 connection.commit()
 
-def export_csv(cursor, path=None):
-    if path == None:
-        path = DB_PATH + "tasker.csv"
+
+def export_csv(cursor, path=DB_PATH + "tasker.csv"):
     with open(path, 'w') as csv:
         for id, name, desc in cursor.execute("SELECT * FROM tasker"):
             csv.write("%s, %s, %s\n" % (id, name, desc))
 
-def export_json(cursor, path=None):
-    if path == None:
-        path = DB_PATH + "tasker.json"
-    db = {}
+
+def export_json(cursor, path=DB_PATH + "tasker.csv"):
+    db = dict()
     for id, name, desc in cursor.execute("SELECT * FROM tasker"):
-        db[id] = {
-            "id": id,
-            "name": name,
-            "desc": desc,
-        }
-        with open(path, 'w') as j:
-            j.write(json.dumps(db) + "\n")
+        db[id] = {"id": id, "name": name, "desc": desc}
+    with open(path, 'w') as j:
+        j.write(json.dumps(db) + "\n")
 
 # $ tasker
 if len(sys.argv) > 1:
@@ -51,15 +46,18 @@ if len(sys.argv) > 1:
         connection.commit()
     # $ tasker remove 1
     if sys.argv[1] in ["remove", "delete", "del", "rem"]:
-        cursor.execute("DELETE FROM tasker WHERE id LIKE %i" % int(sys.argv[2]))
-        #TODO Find a better way of reindexing the table
+        cursor.execute("DELETE FROM tasker WHERE id LIKE %i" %
+                       int(sys.argv[2]))
+        # TODO Find a better way of reindexing the table
         rows = []
         for id, name, desc in cursor.execute("SELECT * FROM tasker"):
             rows.append((id, name, desc))
         cursor.execute("DROP TABLE tasker")
-        cursor.execute('CREATE TABLE  tasker (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT)')
+        cursor.execute(
+            'CREATE TABLE  tasker (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT)')
         for row in rows:
-            cursor.execute('INSERT INTO tasker (name, description) VALUES ("%s", "%s")'% (row[1], row[2]))
+            cursor.execute(
+                'INSERT INTO tasker (name, description) VALUES ("%s", "%s")' % (row[1], row[2]))
 
         print("Task %i was removed" % int(sys.argv[2]))
         connection.commit()
