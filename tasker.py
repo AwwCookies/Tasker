@@ -14,6 +14,7 @@ import os
 
 # Path to Tasker DB
 DB_PATH = "/home/aww/"
+UPDATE_URL = "https://raw.githubusercontent.com/AwwCookies/Tasker/master/tasker.py"
 
 connection = sqlite3.connect(DB_PATH + "tasker.db")
 cursor = connection.cursor()
@@ -38,8 +39,7 @@ def export_json(cursor):
 
 
 def update():
-    ud = urllib.request.urlopen(
-        'https://raw.githubusercontent.com/AwwCookies/Tasker/master/tasker.py').read().decode('utf-8')
+    ud = urllib.request.urlopen(UPDATE_URL).read().decode('utf-8')
     with open("/tmp/tasker.py", 'w') as updated_file:
         updated_file.write(str(ud))
     os.system("sudo mv /tmp/tasker.py /usr/bin/tasker")
@@ -71,7 +71,7 @@ if len(sys.argv) > 1:
         print("Task %i was removed" % int(sys.argv[2]))
         connection.commit()
     if sys.argv[1] in ["purge", "remove_all", "fuckit"]:
-        if str(raw_input("Are you sure you want to delete all your task?: ")) in ["y", "yes", "fuck yes"]:
+        if str(input("Are you sure you want to delete all your task?: ")) in ["y", "yes", "fuck yes"]:
             cursor.execute("DROP TABLE tasker")
             print("The evil has been purged.")
     if sys.argv[1] in ["help", "wtf"]:
