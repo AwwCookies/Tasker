@@ -7,18 +7,40 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 import sqlite3
+import json
 import sys
 
 # Path to Tasker DB
-DB_PATH = "/home/aww/tasker.db"
+DB_PATH = "/home/aww/"
 
-connection = sqlite3.connect(DB_PATH)
+connection = sqlite3.connect(DB_PATH + "tasker.db")
 cursor = connection.cursor()
 
 # Create a new table in the database if one does not exists with three cols
 cursor.execute("CREATE TABLE IF NOT EXISTS tasker (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT)")
 # This saves the changes to the database
 connection.commit()
+
+def export_csv(cursor, path=None):
+    if path == None:
+        path = DB_PATH + "tasker.csv"
+    with open(path, 'w') as csv:
+        for id, name, desc in cursor.execute("SELECT * FROM tasker"):
+            csv.write("%s, %s, %s\n" % (id, name, desc))
+
+def export_json(cursor, path=None):
+    if path == None:
+        path = DB_PATH + "tasker.json"
+    db = {}
+    for id, name, desc in cursor.execute("SELECT * FROM tasker"):
+        db[id] = {
+            "id": id,
+            "name": name,
+            "desc": desc,
+        }
+        with open(path, 'w') as j:
+            j.write(json.dumps(db) + "\n")
+
 # $ tasker
 if len(sys.argv) > 1:
     # $ tasker add Cookies go buy cookies
@@ -47,6 +69,17 @@ if len(sys.argv) > 1:
             print("The evil has been purged.")
     if sys.argv[1] in ["help", "wtf"]:
         pass
+    if sys.argv[1] == "export":
+        if sys.argv[2] == "csv":
+            if len(sys.argv) > 3:
+                export_csv(cursor, sys.argv[3])
+            else:
+                export_csv(cursor)
+        elif sys.argv[2] == "json":
+            if len(sys.argv) > 3:
+                export_json(cursor, sys.argv[3])
+            else:
+                export_json(cursor)
 else:
     for id, name, description in cursor.execute("SELECT * FROM tasker"):
         print("[%i] %s: %s" % (id, name, description))
