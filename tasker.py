@@ -38,6 +38,25 @@ def export_json(cursor):
     print(json.dumps(db))
 
 
+def import_csv(cursor, file_path):
+    with open(file_path, 'r') as csv:
+        for line in csv.readlines():
+            name = line.split(',')[1].strip()
+            desc = ' '.join(line.split(',')[2:]).strip()
+            cursor.execute(
+                'INSERT INTO tasker (name, description) VALUES ("%s", "%s")' % (name, desc))
+            print("Task: %s added!" % name)
+
+
+def import_json(cursor, file_path):
+    db = json.loads(open(file_path).read())
+    for key in db.keys():
+        cursor.execute(
+            'INSERT INTO tasker (name, description) VALUES ("%s", "%s")' % (
+                db[key]["name"], db[key]["desc"]))
+        print("Task: %s added!" % db[key]["name"])       
+
+
 def update():
     ud = urllib.request.urlopen(UPDATE_URL).read().decode('utf-8')
     with open("/tmp/tasker.py", 'w') as updated_file:
@@ -84,6 +103,13 @@ if len(sys.argv) > 1:
     if sys.argv[1] == "update":
         update()
         print("Update complete")
+    if sys.argv[1] == "import":
+        if sys.argv[2] == "csv":
+            import_csv(cursor, sys.argv[3])
+            connection.commit()
+        if sys.argv[2] == "json":
+            import_json(cursor, sys.argv[3])
+            connection.commit()
 else:
     for ID, name, description in cursor.execute("SELECT * FROM tasker"):
         print("[%i] %s: %s" % (ID, name, description))
