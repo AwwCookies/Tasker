@@ -2,8 +2,8 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #   Author: Emma Jones (AwwCookies)                                           #
-#   Last Update: Apr 30 2015                                              # # #
-#   Version: 1.4                                                          # #
+#   Last Update: May 02 2015                                              # # #
+#   Version: 2.0                                                          # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sqlite3
@@ -12,7 +12,9 @@ import sys
 import urllib.request
 import os
 
-# Path to Tasker DB
+from prettytable import PrettyTable
+
+# CONFIG
 DB_PATH = "/home/aww/"
 UPDATE_URL = "https://raw.githubusercontent.com/AwwCookies/Tasker/master/tasker.py"
 
@@ -111,5 +113,8 @@ if len(sys.argv) > 1:
             import_json(cursor, sys.argv[3])
             connection.commit()
 else:
-    for ID, name, description in cursor.execute("SELECT * FROM tasker"):
-        print("[%i] %s: %s" % (ID, name, description))
+    table = PrettyTable()
+    table.field_names = ['ID', "Name", "Description"]
+    for ID, name, desc in cursor.execute("SELECT * FROM tasker"):
+        table.add_row([ID, name, desc])
+    print(table.get_string())
