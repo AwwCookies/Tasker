@@ -2,8 +2,8 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #   Author: Emma Jones (AwwCookies)                                           #
-#   Last Update: May 02 2015                                              # # #
-#   Version: 2.0                                                          # #
+#   Last Update: May 06 2015                                              # # #
+#   Version: 3.0                                                          # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sqlite3
@@ -26,6 +26,9 @@ cursor.execute(
     "CREATE TABLE IF NOT EXISTS tasker (ID INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, description TEXT)")
 # This saves the changes to the database
 connection.commit()
+
+def strikethrough(text):
+    return ''.join([u'\u0336{}'.format(c) for c in text])
 
 
 def export_csv(cursor):
@@ -56,7 +59,7 @@ def import_json(cursor, file_path):
         cursor.execute(
             'INSERT INTO tasker (name, description) VALUES ("%s", "%s")' % (
                 db[key]["name"], db[key]["desc"]))
-        print("Task: %s added!" % db[key]["name"])       
+        print("Task: %s added!" % db[key]["name"])
 
 
 def update():
@@ -68,6 +71,7 @@ def update():
 
 # $ tasker
 if len(sys.argv) > 1:
+    sys.argv[1] = sys.argv[1].lower()
     # $ tasker add Cookies go buy cookies
     if sys.argv[1] in ["add", "a", "new", "create"]:
         cursor.execute('INSERT INTO tasker (name, description) VALUES ("%s", "%s")'
@@ -112,9 +116,17 @@ if len(sys.argv) > 1:
         if sys.argv[2] == "json":
             import_json(cursor, sys.argv[3])
             connection.commit()
+    if sys.argv[1] in ["complete", "done", "cross", "x"]:
+        for row in cursor.execute("SELECT * FROM tasker WHERE ID LIKE %i" % int(sys.argv[2])):
+            cursor.execute('UPDATE tasker SET name=?, description=? WHERE ID=?', (strikethrough(row[1]), strikethrough(row[2]), int(sys.argv[2])))
+        connection.commit()
 else:
-    table = PrettyTable()
+    table = PrettyTable(encoding=None)
     table.field_names = ['ID', "Name", "Description"]
     for ID, name, desc in cursor.execute("SELECT * FROM tasker"):
         table.add_row([ID, name, desc])
-    print(table.get_string())
+    for row in table.get_string().split("\n"):
+        if "\e[9em" in row and "\e[0m" in row:
+            print(strikethrough(row))
+        else:
+            print(row)
