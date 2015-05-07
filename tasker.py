@@ -127,6 +127,6 @@ else:
         table.add_row([ID, name, desc])
     for row in table.get_string().split("\n"):
         if "\e[9em" in row and "\e[0m" in row:
-            print(strikethrough(row))
+            print(row)
         else:
             print(row)
