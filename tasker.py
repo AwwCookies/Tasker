@@ -125,8 +125,4 @@ else:
     table.field_names = ['ID', "Name", "Description"]
     for ID, name, desc in cursor.execute("SELECT * FROM tasker"):
         table.add_row([ID, name, desc])
-    for row in table.get_string().split("\n"):
-        if "\e[9em" in row and "\e[0m" in row:
-            print(row)
-        else:
-            print(row)
+    print(table.get_string())
